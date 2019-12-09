@@ -1,8 +1,8 @@
 wget https://github.com/seqan/flexbar/releases/download/v3.5.0/flexbar-3.5.0-linux.tar.gz
 tar zxf flexbar-3.5.0-linux.tar.gz
-conda create -n umi_tools python=3.5 umi_tools
+conda create -n iCLIP2 python=3.5 fastqc fastx_toolkit seqtk star umi_tools bedtools samtools pureclip
 
-DATA=/var/data/raw_data/HJY/HJY_20190123_YJiang_RBFOX2_iClip_2sam_3rep/Undetermined_S0_L006_R1_001.fastq.gz
+DATA=/var/data/raw_data/HJY/HJY_iCLIP_JiangYan190722-X1B_L003/Undetermined_S0_L003_R1_001.fastq.gz
 barcodeLength=15
 minBaseQuality=10
 minReadLength=15
@@ -11,6 +11,9 @@ adapter=TGAGATCGGAAGAGCGGTTCAG
 genomeMappingIndex=/home/xfu/Gmatic7/genome/human/STAR/
 GTF=/home/xfu/Gmatic7/gene/human/GRCh38_v29.gtf
 FAI=/home/xfu/Gmatic7/genome/human/GRCh38.fa.fai
+#genomeMappingIndex=/home/xfu/Gmatic7/genome/mouse/STAR/
+#GTF=/home/xfu/Gmatic7/gene/mouse/GRCm38_vM19.gtf
+#FAI=/home/xfu/Gmatic7/genome/mouse/GRCm38.fa.fai
 
 ##====================
 ## Quality control
