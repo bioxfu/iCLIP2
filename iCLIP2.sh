@@ -39,7 +39,7 @@ zcat $DATA | fastx_trimmer -l $barcodeLength | fastq_quality_filter -q $minBaseQ
 #### Extract reads of given read IDs (using seqtk) and remove problematic characters and whitespaces from read IDs
 
 #seqtk subseq $DATA tmp/data.qualFilteredIDs.list | sed 's/ /#/g; s/\\//#/g' | gzip > filtered.fastq.gz
-./seqtk_batch.sh
+./seqtk_batch.sh $DATA
 
 ###------------------------
 ### Barcode frequencies 
@@ -48,6 +48,7 @@ zcat $DATA | fastx_trimmer -l $barcodeLength | fastq_quality_filter -q $minBaseQ
 #### Extract all detected experimental barcodes and their frequencies (x = length of UMI1, y = length of the experimental barcodes)
 
 #zcat filtered.fastq.gz | awk -v umi1_len=5 -v exp_bc_len=6 '{ if (FNR%4==2) print substr($1,(umi1_len+1),exp_bc_len) }' | sort | uniq -c | sort -k1,1rn > exp_barcodes.detected
+mkdir results
 ./barcode_freq_batch.sh
 
 
@@ -75,7 +76,6 @@ cat x*_WT_rep2.fastq.gz > WT_rep2.fastq.gz
 cat x*_WT_rep3.fastq.gz > WT_rep3.fastq.gz
 
 cd ..
-mkdir results
 cat demultiplex/*.lengthdist|sort -n|uniq|groupBy -g 1 -c 2 -o sum|sed 's/\./Count/' > results/all_reads.lengthdist
 
 #### Plot reads length distribution using FASTX-Toolkit
@@ -109,7 +109,6 @@ cd ..
 ##======================================
 
 #### Duplicate removal (deduplication) using UMI-tools
-source activate umi_tools
 mkdir dedup
 find mapping/*.bam|sed 's/mapping\///;s/\.bam//'|xargs -I {} umi_tools dedup -I mapping/{}.bam -L dedup/{}.duprm.log -S dedup/{}.duprm.bam --extract-umi-method read_id --method unique
 
