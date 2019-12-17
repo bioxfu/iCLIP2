@@ -12,7 +12,7 @@
 # The following files need to be specified to run the code:
 
 ### Path to .gtf file that holds gene annotations 
-annotation.file <- '/home/xfu/Gmatic7/gene/human/GRCh38_v29.gtf'
+#annotation.file <- '/home/xfu/Gmatic7/gene/human/GRCh38_v29.gtf'
   
 ### Path to folder with bw files
 mypath <- 'bed'
@@ -41,7 +41,8 @@ library(UpSetR)
 library(GenomicFeatures)
 
 argv <- commandArgs(T)
-sampleX <- argv[1]
+annotation.file <- argv[1]
+sampleX <- argv[2]
 #sampleX <- 'WT'
 
 ### Load clip tracks per replicate and strand 

@@ -1,6 +1,6 @@
 wget https://github.com/seqan/flexbar/releases/download/v3.5.0/flexbar-3.5.0-linux.tar.gz
 tar zxf flexbar-3.5.0-linux.tar.gz
-conda create -n iCLIP2 python=3.5 fastqc fastx_toolkit seqtk star umi_tools bedtools samtools pureclip
+conda create -n iCLIP2 python=3.5 fastqc fastx_toolkit seqtk star=2.5.3a umi_tools bedtools samtools pureclip
 
 DATA=/var/data/raw_data/HJY/HJY_iCLIP_JiangYan190722-X1B_L003/Undetermined_S0_L003_R1_001.fastq.gz
 barcodeLength=15
@@ -68,12 +68,12 @@ cd demultiplex
 ../demultiplex_batch.sh
 
 cat x*_Ctrl.fastq.gz > Ctrl.fastq.gz
-cat x*_KO_rep1.fastq.gz > KO_rep1.fastq.gz
-cat x*_KO_rep2.fastq.gz > KO_rep2.fastq.gz
-cat x*_KO_rep3.fastq.gz > KO_rep3.fastq.gz
-cat x*_WT_rep1.fastq.gz > WT_rep1.fastq.gz
-cat x*_WT_rep2.fastq.gz > WT_rep2.fastq.gz
-cat x*_WT_rep3.fastq.gz > WT_rep3.fastq.gz
+cat x*_hs_rep1.fastq.gz > hs_rep1.fastq.gz
+cat x*_hs_rep2.fastq.gz > hs_rep2.fastq.gz
+cat x*_hs_rep3.fastq.gz > hs_rep3.fastq.gz
+cat x*_mm_rep1.fastq.gz > mm_rep1.fastq.gz
+cat x*_mm_rep2.fastq.gz > mm_rep2.fastq.gz
+cat x*_mm_rep3.fastq.gz > mm_rep3.fastq.gz
 
 cd ..
 cat demultiplex/*.lengthdist|sort -n|uniq|groupBy -g 1 -c 2 -o sum|sed 's/\./Count/' > results/all_reads.lengthdist
@@ -93,13 +93,22 @@ cat demultiplex/*.lengthdist|sort -n|uniq|groupBy -g 1 -c 2 -o sum|sed 's/\./Cou
 #### Genomic mapping using STAR
 mkdir mapping
 cd mapping
+maxReadLength=150
+genomeMappingIndex=/home/xfu/Gmatic7/genome/human/STAR/
+GTF=/home/xfu/Gmatic7/gene/human/GRCh38_v29.gtf
+FAI=/home/xfu/Gmatic7/genome/human/GRCh38.fa.fai
 STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix Ctrl_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/Ctrl.fastq.gz
-STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix KO_rep1_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/KO_rep1.fastq.gz
-STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix KO_rep2_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/KO_rep2.fastq.gz
-STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix KO_rep3_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/KO_rep3.fastq.gz
-STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix WT_rep1_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/WT_rep1.fastq.gz
-STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix WT_rep2_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/WT_rep2.fastq.gz
-STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix WT_rep3_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/WT_rep3.fastq.gz
+STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix hs_rep1_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/hs_rep1.fastq.gz
+STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix hs_rep2_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/hs_rep2.fastq.gz
+STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix hs_rep3_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/hs_rep3.fastq.gz
+
+maxReadLength=150
+genomeMappingIndex=/home/xfu/Gmatic7/genome/mouse/STAR/
+GTF=/home/xfu/Gmatic7/gene/mouse/GRCm38_vM19.gtf
+FAI=/home/xfu/Gmatic7/genome/mouse/GRCm38.fa.fai
+STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix mm_rep1_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/mm_rep1.fastq.gz
+STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix mm_rep2_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/mm_rep2.fastq.gz
+STAR --runMode alignReads --runThreadN 30 --outFileNamePrefix mm_rep3_ --genomeDir $genomeMappingIndex --outFilterMismatchNoverReadLmax 0.04 --outFilterMismatchNmax 999 --outFilterMultimapNmax 1 --alignEndsType Extend5pOfRead1 --sjdbGTFfile $GTF --sjdbOverhang $maxReadLength-1 --outReadsUnmapped Fastx --outSJfilterReads Unique --readFilesCommand zcat --outSAMtype BAM SortedByCoordinate --readFilesIn ../demultiplex/mm_rep3.fastq.gz
 find *.bam|parallel --gnu "samtools index {}"
 cd ..
 
@@ -129,18 +138,24 @@ find dedup/*.bam|sed 's/dedup\///;s/\.bam//'|parallel --gnu "bedtools bamtobed -
  
 
 #### Shift intervals depending on the strand by 1 bp upstream using BEDTools
-find bed/*.bed|sed 's/bed\///;s/\.bed//'|parallel --gnu "bedtools shift -m 1 -p -1 -i bed/{}.bed -g $FAI > bed/{}.shifted.bed"
+FAI=/home/xfu/Gmatic7/genome/human/GRCh38.fa.fai
+find bed/*.bed|sed 's/bed\///;s/\.bed//'|grep -v 'mm_'|parallel --gnu "bedtools shift -m 1 -p -1 -i bed/{}.bed -g $FAI > bed/{}.shifted.bed"
  
+FAI=/home/xfu/Gmatic7/genome/mouse/GRCm38.fa.fai
+find bed/*.bed|sed 's/bed\///;s/\.bed//'|grep 'mm_'|parallel --gnu "bedtools shift -m 1 -p -1 -i bed/{}.bed -g $FAI > bed/{}.shifted.bed"
 
 #### Extract the 5' end of the shifted intervals and pile up into coverage track in bedgraph file format (separately for each strand) using BEDTools (in case of RPM-normalised coverage tracks, use additional parameter -scale with 1,000,000/#mappedReads)
+FAI=/home/xfu/Gmatic7/genome/human/GRCh38.fa.fai
+find bed/*.shifted.bed|sed 's/bed\///;s/\.bed//'|grep -v 'mm_'|parallel --gnu "bedtools genomecov -bg -strand + -5 -i bed/{}.bed -g $FAI > bed/{}.plus.bedgraph"
+find bed/*.shifted.bed|sed 's/bed\///;s/\.bed//'|grep -v 'mm_'|parallel --gnu "bedtools genomecov -bg -strand - -5 -i bed/{}.bed -g $FAI > bed/{}.minus.bedgraph"
 
-find bed/*.shifted.bed|sed 's/bed\///;s/\.bed//'|parallel --gnu "bedtools genomecov -bg -strand + -5 -i bed/{}.bed -g $FAI > bed/{}.plus.bedgraph"
-find bed/*.shifted.bed|sed 's/bed\///;s/\.bed//'|parallel --gnu "bedtools genomecov -bg -strand - -5 -i bed/{}.bed -g $FAI > bed/{}.minus.bedgraph"
-
+FAI=/home/xfu/Gmatic7/genome/mouse/GRCm38.fa.fai
+find bed/*.shifted.bed|sed 's/bed\///;s/\.bed//'|grep 'mm_'|parallel --gnu "bedtools genomecov -bg -strand + -5 -i bed/{}.bed -g $FAI > bed/{}.plus.bedgraph"
+find bed/*.shifted.bed|sed 's/bed\///;s/\.bed//'|grep 'mm_'|parallel --gnu "bedtools genomecov -bg -strand - -5 -i bed/{}.bed -g $FAI > bed/{}.minus.bedgraph"
 
 #### make tdf file
-mkdir track
-find bed/*.bedgraph|sed 's/bed\///;s/\.bedgraph//'|parallel --gnu "igvtools toTDF bed/{}.bedgraph bed/{}.tdf /home/xfu/igv/genomes/hg38.genome"
+#mkdir track
+#find bed/*.bedgraph|sed 's/bed\///;s/\.bedgraph//'|parallel --gnu "igvtools toTDF bed/{}.bedgraph bed/{}.tdf /home/xfu/igv/genomes/hg38.genome"
 
 
 
@@ -150,7 +165,12 @@ chmod +x bedGraphToBigWig
 
 export LC_COLLATE=C
 find bed/*.bedgraph|sed 's/\.bedgraph//'|parallel --gnu "sort -k1,1 -k2,2n {}.bedgraph > {}.sorted.bedgraph"
-find bed/*.sorted.bedgraph|sed 's/\.bedgraph//'|parallel --gnu "./bedGraphToBigWig {}.bedgraph $FAI {}.bw"
+
+FAI=/home/xfu/Gmatic7/genome/human/GRCh38.fa.fai
+find bed/*.sorted.bedgraph|sed 's/\.bedgraph//'|grep -v 'mm_'|parallel --gnu "./bedGraphToBigWig {}.bedgraph $FAI {}.bw"
+
+FAI=/home/xfu/Gmatic7/genome/mouse/GRCm38.fa.fai
+find bed/*.sorted.bedgraph|sed 's/\.bedgraph//'|grep 'mm_'|parallel --gnu "./bedGraphToBigWig {}.bedgraph $FAI {}.bw"
 
 #### Depending on the system and the version of bedGraphToBigWig, it might be necessary to sort the bedgraph files before converting them to bw files:
 #export LC_COLLATE=C
@@ -176,20 +196,20 @@ find bed/*.sorted.bedgraph|sed 's/\.bedgraph//'|parallel --gnu "./bedGraphToBigW
 #cat bed/${sampleX}_Aligned.sortedByCoord.out.duprm.shifted.*.bedgraph | awk 'BEGIN{ totalstackedpos=0 }{ if($4 > 1) totalstackedpos += ($3 - $2) }END{ print "nucleotides_with_stacked_crosslink_events\t"totalstackedpos }' >> results/${sampleX}_Xlink_stat.tsv
 
 ./Xlink_stat.sh Ctrl
-./Xlink_stat.sh KO_rep1
-./Xlink_stat.sh KO_rep2
-./Xlink_stat.sh KO_rep3
-./Xlink_stat.sh WT_rep1
-./Xlink_stat.sh WT_rep2
-./Xlink_stat.sh WT_rep3
+./Xlink_stat.sh hs_rep1
+./Xlink_stat.sh hs_rep2
+./Xlink_stat.sh hs_rep3
+./Xlink_stat.sh mm_rep1
+./Xlink_stat.sh mm_rep2
+./Xlink_stat.sh mm_rep3
 
 ./deduplication_stat.sh Ctrl
-./deduplication_stat.sh KO_rep1
-./deduplication_stat.sh KO_rep2
-./deduplication_stat.sh KO_rep3
-./deduplication_stat.sh WT_rep1
-./deduplication_stat.sh WT_rep2
-./deduplication_stat.sh WT_rep3
+./deduplication_stat.sh hs_rep1
+./deduplication_stat.sh hs_rep2
+./deduplication_stat.sh hs_rep3
+./deduplication_stat.sh mm_rep1
+./deduplication_stat.sh mm_rep2
+./deduplication_stat.sh mm_rep3
 
 # make_stat_table
 paste results/dedup_stat*.tsv|cut -f1,2,4,6,8,10,12,14,16 > stat_table.tsv
@@ -222,49 +242,70 @@ paste results/Xlink_stat*.tsv|cut -f1,2,4,6,8,10,12,14,16|grep -v 'Ctrl' >> stat
 mkdir peak
 cd peak
 
-samtools merge -f WT_merged.bam ../dedup/WT_rep1_Aligned.sortedByCoord.out.duprm.bam ../dedup/WT_rep2_Aligned.sortedByCoord.out.duprm.bam ../dedup/WT_rep3_Aligned.sortedByCoord.out.duprm.bam
-samtools index WT_merged.bam
+samtools merge -f hs_merged.bam ../dedup/hs_rep1_Aligned.sortedByCoord.out.duprm.bam ../dedup/hs_rep2_Aligned.sortedByCoord.out.duprm.bam ../dedup/hs_rep3_Aligned.sortedByCoord.out.duprm.bam
+samtools index hs_merged.bam
 
-samtools merge -f KO_merged.bam ../dedup/KO_rep1_Aligned.sortedByCoord.out.duprm.bam ../dedup/KO_rep2_Aligned.sortedByCoord.out.duprm.bam ../dedup/KO_rep3_Aligned.sortedByCoord.out.duprm.bam
-samtools index KO_merged.bam
+samtools merge -f mm_merged.bam ../dedup/mm_rep1_Aligned.sortedByCoord.out.duprm.bam ../dedup/mm_rep2_Aligned.sortedByCoord.out.duprm.bam ../dedup/mm_rep3_Aligned.sortedByCoord.out.duprm.bam
+samtools index mm_merged.bam
 
 #### Run PureCLIP on fat node (1T RAM)
 GENOME=/home/xfu/Gmatic7/genome/human/GRCh38.fa
-pureclip -i KO_merged.bam -bai KO_merged.bam.bai -g $GENOME -ld -nt 10 -o KO_PureCLIP.crosslink_sites.bed -or KO_PureCLIP.crosslink_regions.bed
-pureclip -i WT_merged.bam -bai WT_merged.bam.bai -g $GENOME -ld -nt 10 -o WT_PureCLIP.crosslink_sites.bed -or WT_PureCLIP.crosslink_regions.bed
+pureclip -i hs_merged.bam -bai hs_merged.bam.bai -g $GENOME -ld -nt 10 -o hs_PureCLIP.crosslink_sites.bed -or hs_PureCLIP.crosslink_regions.bed
+
+GENOME=/home/xfu/Gmatic7/genome/mouse/GRCm38.fa
+pureclip -i mm_merged.bam -bai mm_merged.bam.bai -g $GENOME -ld -nt 10 -o mm_PureCLIP.crosslink_sites.bed -or mm_PureCLIP.crosslink_regions.bed
 
 
 #### Remove 7th column of PureCLIP output file
-cat KO_PureCLIP.crosslink_sites.bed | cut -f 1,2,3,4,5,6|grep '^chr' > KO_PureCLIP.crosslink_sites_short.bed
-cat WT_PureCLIP.crosslink_sites.bed | cut -f 1,2,3,4,5,6|grep '^chr' > WT_PureCLIP.crosslink_sites_short.bed
+cat hs_PureCLIP.crosslink_sites.bed | cut -f 1,2,3,4,5,6|grep '^chr' > hs_PureCLIP.crosslink_sites_short.bed
+cat mm_PureCLIP.crosslink_sites.bed | cut -f 1,2,3,4,5,6|grep '^chr' > mm_PureCLIP.crosslink_sites_short.bed
 
 
-bedtools bamtobed -i peak/KO_merged.bam > peak/KO_merged.bed
-bedtools bamtobed -i peak/WT_merged.bam > peak/WT_merged.bed
+bedtools bamtobed -i peak/hs_merged.bam > peak/hs_merged.bed
+bedtools bamtobed -i peak/mm_merged.bam > peak/mm_merged.bed
 
-bedtools shift -m 1 -p -1 -i peak/KO_merged.bed -g $FAI > peak/KO_merged.shifted.bed
-bedtools shift -m 1 -p -1 -i peak/WT_merged.bed -g $FAI > peak/WT_merged.shifted.bed
+FAI=/home/xfu/Gmatic7/genome/human/GRCh38.fa.fai
+bedtools shift -m 1 -p -1 -i peak/hs_merged.bed -g $FAI > peak/hs_merged.shifted.bed
+bedtools genomecov -bg -strand + -5 -i peak/hs_merged.shifted.bed -g $FAI|grep '^chr' |sortBed > peak/hs_merged.shifted.plus.bedgraph
+bedtools genomecov -bg -strand - -5 -i peak/hs_merged.shifted.bed -g $FAI|grep '^chr' |sortBed > peak/hs_merged.shifted.minus.bedgraph
+./bedGraphToBigWig peak/hs_merged.shifted.plus.bedgraph  $FAI peak/hs_merged.shifted.plus.bw
+./bedGraphToBigWig peak/hs_merged.shifted.minus.bedgraph $FAI peak/hs_merged.shifted.minus.bw
 
-bedtools genomecov -bg -strand + -5 -i peak/KO_merged.shifted.bed -g $FAI|grep '^chr' |sortBed > peak/KO_merged.shifted.plus.bedgraph &
-bedtools genomecov -bg -strand - -5 -i peak/KO_merged.shifted.bed -g $FAI|grep '^chr' |sortBed > peak/KO_merged.shifted.minus.bedgraph &
-bedtools genomecov -bg -strand + -5 -i peak/WT_merged.shifted.bed -g $FAI|grep '^chr' |sortBed > peak/WT_merged.shifted.plus.bedgraph &
-bedtools genomecov -bg -strand - -5 -i peak/WT_merged.shifted.bed -g $FAI|grep '^chr' |sortBed > peak/WT_merged.shifted.minus.bedgraph &
-
-./bedGraphToBigWig peak/KO_merged.shifted.plus.bedgraph $FAI peak/KO_merged.shifted.plus.bw &
-./bedGraphToBigWig peak/KO_merged.shifted.minus.bedgraph $FAI peak/KO_merged.shifted.minus.bw &
-./bedGraphToBigWig peak/WT_merged.shifted.plus.bedgraph $FAI peak/WT_merged.shifted.plus.bw &
-./bedGraphToBigWig peak/WT_merged.shifted.minus.bedgraph $FAI peak/WT_merged.shifted.minus.bw &
-
-~/R/3.6.1/bin/Rscript iCLIP2_postprocess_PureCLIP_peak.R WT
-~/R/3.6.1/bin/Rscript iCLIP2_postprocess_PureCLIP_peak.R KO
-
-~/R/3.6.1/bin/Rscript iCLIP2_binding_sites_clean.R WT
-~/R/3.6.1/bin/Rscript iCLIP2_binding_sites_clean.R KO
+FAI=/home/xfu/Gmatic7/genome/mouse/GRCm38.fa.fai
+bedtools shift -m 1 -p -1 -i peak/mm_merged.bed -g $FAI > peak/mm_merged.shifted.bed
+bedtools genomecov -bg -strand + -5 -i peak/mm_merged.shifted.bed -g $FAI|grep '^chr' |sortBed > peak/mm_merged.shifted.plus.bedgraph
+bedtools genomecov -bg -strand - -5 -i peak/mm_merged.shifted.bed -g $FAI|grep '^chr' |sortBed > peak/mm_merged.shifted.minus.bedgraph
+./bedGraphToBigWig peak/mm_merged.shifted.plus.bedgraph  $FAI peak/mm_merged.shifted.plus.bw
+./bedGraphToBigWig peak/mm_merged.shifted.minus.bedgraph $FAI peak/mm_merged.shifted.minus.bw
 
 
-~/R/3.6.1/bin/Rscript iCLIP2_binding_sites_clean.R WT
+~/R/3.6.1/bin/Rscript iCLIP2_postprocess_PureCLIP_peak.R hs
+~/R/3.6.1/bin/Rscript iCLIP2_postprocess_PureCLIP_peak.R mm
+
+mkdir figure
+GTF=/home/xfu/Gmatic7/gene/human/GRCh38_v29.gtf
+~/R/3.6.1/bin/Rscript iCLIP2_binding_sites_clean.R $GTF hs
+
+GTF=/home/xfu/Gmatic7/gene/mouse/GRCm38_vM19.gtf
+~/R/3.6.1/bin/Rscript iCLIP2_binding_sites_clean.R $GTF mm
 
 ./motif_zscore.sh
 
 ~/R/3.6.1/bin/Rscript motif_zscore.R
 
+echo -e 'PureCLIP peak\t\t'`cat peak/hs_PureCLIP.crosslink_sites_short.bed|wc -l`'\t\t\t'`cat peak/mm_PureCLIP.crosslink_sites_short.bed|wc -l` >> stat_table.tsv
+echo -e 'clean binding sites\t\t'`cat results/hs_binding_site_clean.bed|wc -l`'\t\t\t'`cat results/mm_binding_site_clean.bed|wc -l` >> stat_table.tsv 
+
+## Z-score
+./iCLIP_jellyfish_kmerCounting_hs.sh peak/hs_PureCLIP.crosslink_sites_short.bed 6 11nt.window human
+./iCLIP_jellyfish_kmerCounting_mm.sh peak/mm_PureCLIP.crosslink_sites_short.bed 6 11nt.window mouse
+./iCLIP_jellyfish_kmerCounting_hs.sh peak/hs_PureCLIP.crosslink_sites_short.bed 5 11nt.window human
+./iCLIP_jellyfish_kmerCounting_mm.sh peak/mm_PureCLIP.crosslink_sites_short.bed 5 11nt.window mouse
+
+./iCLIP_jellyfish_kmerCounting_hs.sh peak/hs_PureCLIP.crosslink_sites_short.bed 6 21nt.window human
+./iCLIP_jellyfish_kmerCounting_mm.sh peak/mm_PureCLIP.crosslink_sites_short.bed 6 21nt.window mouse
+./iCLIP_jellyfish_kmerCounting_hs.sh peak/hs_PureCLIP.crosslink_sites_short.bed 5 21nt.window human
+./iCLIP_jellyfish_kmerCounting_mm.sh peak/mm_PureCLIP.crosslink_sites_short.bed 5 21nt.window mouse
+
+rm motif/*/*/crosslink*
+rm motif/*/*/*kmer.tsv
