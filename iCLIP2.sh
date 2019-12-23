@@ -338,3 +338,8 @@ done
 
 Rscript reproduced_sites.R reproduce/crosslink_sites_reproduce_all.tsv reproduce/crosslink_sites_reproduce_all.pdf
 
+## pie plot of peak annotation
+~/R/3.2.4/bin/Rscript iCLIP_peak_anno.R peak/hs_PureCLIP.crosslink_sites_short.bed /home/xfu/Gmatic7/gene/human/txdb/GRCh38_v29_txdb.sqlite   figure/hs_PureCLIP.crosslink_sites_short.bed_pie.pdf
+~/R/3.2.4/bin/Rscript iCLIP_peak_anno.R peak/mm_PureCLIP.crosslink_sites_short.bed /home/xfu/Gmatic7/gene/mouse/txdb/GRCm38_vM19_txdb.sqlite  figure/mm_PureCLIP.crosslink_sites_short.bed_pie.pdf
+
+
