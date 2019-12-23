@@ -309,3 +309,32 @@ echo -e 'clean binding sites\t\t'`cat results/hs_binding_site_clean.bed|wc -l`'\
 
 rm motif/*/*/crosslink*
 rm motif/*/*/*kmer.tsv
+
+# reproduce
+mkdir reproduce
+echo -e "file\trep\twindow\tc0\tc1\tc2\tstrand" > reproduce/crosslink_sites_reproduce_all.tsv
+for F in $(find bed/*rep*sorted.bedgraph|sed 's/_rep.*//'|sort|uniq); do
+    cat ${F}_rep1*minus.sorted.bedgraph|awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}} END {print f"\t1\t0\t"c0"\t"c1"\t"c2"\t-"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep1*plus.sorted.bedgraph |awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}} END {print f"\t1\t0\t"c0"\t"c1"\t"c2"\t+"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[23]*minus.sorted.bedgraph|bedtools window -a ${F}_rep1*minus.sorted.bedgraph -b - -w 5 -u |awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t5\t"c0"\t"c1"\t"c2"\t-"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[23]*plus.sorted.bedgraph |bedtools window -a ${F}_rep1*plus.sorted.bedgraph  -b - -w 5 -u |awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t5\t"c0"\t"c1"\t"c2"\t+"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[23]*minus.sorted.bedgraph|bedtools window -a ${F}_rep1*minus.sorted.bedgraph -b - -w 30 -u|awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t30\t"c0"\t"c1"\t"c2"\t-"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[23]*plus.sorted.bedgraph |bedtools window -a ${F}_rep1*plus.sorted.bedgraph  -b - -w 30 -u|awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t30\t"c0"\t"c1"\t"c2"\t+"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+
+    cat ${F}_rep2*minus.sorted.bedgraph|awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}} END {print f"\t1\t0\t"c0"\t"c1"\t"c2"\t-"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep2*plus.sorted.bedgraph |awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}} END {print f"\t1\t0\t"c0"\t"c1"\t"c2"\t+"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[13]*minus.sorted.bedgraph|bedtools window -a ${F}_rep2*minus.sorted.bedgraph -b - -w 5 -u |awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t5\t"c0"\t"c1"\t"c2"\t-"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[13]*plus.sorted.bedgraph |bedtools window -a ${F}_rep2*plus.sorted.bedgraph  -b - -w 5 -u |awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t5\t"c0"\t"c1"\t"c2"\t+"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[13]*minus.sorted.bedgraph|bedtools window -a ${F}_rep2*minus.sorted.bedgraph -b - -w 30 -u|awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t30\t"c0"\t"c1"\t"c2"\t-"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[13]*plus.sorted.bedgraph |bedtools window -a ${F}_rep2*plus.sorted.bedgraph  -b - -w 30 -u|awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t30\t"c0"\t"c1"\t"c2"\t+"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+
+    cat ${F}_rep3*minus.sorted.bedgraph|awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}} END {print f"\t1\t0\t"c0"\t"c1"\t"c2"\t-"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep3*plus.sorted.bedgraph |awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}} END {print f"\t1\t0\t"c0"\t"c1"\t"c2"\t+"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[12]*minus.sorted.bedgraph|bedtools window -a ${F}_rep3*minus.sorted.bedgraph -b - -w 5 -u |awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t5\t"c0"\t"c1"\t"c2"\t-"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[12]*plus.sorted.bedgraph |bedtools window -a ${F}_rep3*plus.sorted.bedgraph  -b - -w 5 -u |awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t5\t"c0"\t"c1"\t"c2"\t+"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[12]*minus.sorted.bedgraph|bedtools window -a ${F}_rep3*minus.sorted.bedgraph -b - -w 30 -u|awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t30\t"c0"\t"c1"\t"c2"\t-"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+    cat ${F}_rep[12]*plus.sorted.bedgraph |bedtools window -a ${F}_rep3*plus.sorted.bedgraph  -b - -w 30 -u|awk -v f=${F} 'BEGIN {c1=0;c2=0;c3=0} {if($4>0){c0+=1}if($4>1){c1+=1}if($4>2){c2+=1}}END{print f"\t1\t30\t"c0"\t"c1"\t"c2"\t+"}' >> reproduce/crosslink_sites_reproduce_all.tsv
+done
+
+Rscript reproduced_sites.R reproduce/crosslink_sites_reproduce_all.tsv reproduce/crosslink_sites_reproduce_all.pdf
+
